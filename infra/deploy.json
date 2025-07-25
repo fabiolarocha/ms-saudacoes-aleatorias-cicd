@@ -1,6 +1,6 @@
 {
   "definition": {
-    "name": "ms-saudacoes-aleatorias",
+    "name": "ms-saudacoes-aleatorias-v2",
     "type": "WEB",
     "docker": {
       "image": "docker.io/${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias",
