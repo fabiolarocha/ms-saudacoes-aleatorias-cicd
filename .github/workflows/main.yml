@@ -71,13 +71,15 @@ jobs:
         working-directory: infra
         env:
           KOYEB_TOKEN: ${{ secrets.KOYEB_TOKEN }} # Passa o token para o Terraform
-
+          TF_VAR_docker_user_name: ${{ secrets.DOCKER_USER }}
+          
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         working-directory: infra
         env:
           KOYEB_TOKEN: ${{ secrets.KOYEB_TOKEN }} # Passa o token para o Terraform
-
+          TF_VAR_docker_user_name: ${{ secrets.DOCKER_USER }}
+ 
   cleanup:
     runs-on: ubuntu-latest
     needs: deploy
