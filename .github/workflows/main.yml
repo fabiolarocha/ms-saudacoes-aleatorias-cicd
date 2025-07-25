@@ -56,12 +56,27 @@ jobs:
     needs: release
     steps:
       - uses: actions/checkout@v3
-      - name: Deploy to Koyeb
-        run: |
-          curl -X POST https://app.koyeb.com/v1/services \
-            -H "Authorization: Bearer ${{ secrets.KOYEB_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d @infra/deploy.json
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0 # Pode ser ajustado se o professor indicar outra versão
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: infra # Garante que o Terraform rode na pasta infra
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+        working-directory: infra
+        env:
+          KOYEB_TOKEN: ${{ secrets.KOYEB_TOKEN }} # Passa o token para o Terraform
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+        working-directory: infra
+        env:
+          KOYEB_TOKEN: ${{ secrets.KOYEB_TOKEN }} # Passa o token para o Terraform
 
   cleanup:
     runs-on: ubuntu-latest
