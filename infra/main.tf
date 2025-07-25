@@ -19,7 +19,7 @@ resource "koyeb_app" "ms-saudacoes-aleatorias-app" {
 # Define o serviço Koyeb que executa a imagem Docker
 resource "koyeb_service" "ms-saudacoes-aleatorias-service" {
   # Vincula este serviço ao aplicativo criado acima
-  app_id = koyeb_app.ms-saudacoes-aleatorias-app.id 
+  app_name = koyeb_app.ms-saudacoes-aleatorias-app_name 
 
   # Definição do serviço em si
   definition {
