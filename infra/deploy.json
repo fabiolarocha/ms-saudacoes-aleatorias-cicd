@@ -1,0 +1,29 @@
+{
+  "name": "ms-saudacoes-aleatorias",
+  "type": "WEB",
+  "docker": {
+    "image": "docker.io/${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias",
+    "command": ["./main"],
+    "ports": [
+      {
+        "port": 8080,
+        "protocol": "http"
+      }
+    ]
+  },
+  "routes": [
+    {
+      "path": "/"
+    }
+  ],
+  "env": [],
+  "regions": ["gcp-europe-west3", "gcp-europe-west2"],
+  "health_checks": [
+    {
+      "port": 8080,
+      "path": "/",
+      "interval_seconds": 10,
+      "timeout_seconds": 5
+    }
+  ]
+}
