@@ -1,0 +1,74 @@
+name: CI/CD Pipeline - Saudações Aleatórias
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      approve:
+        description: 'Aprovar cleanup?'
+        required: false
+        default: 'false'
+
+env:
+  DOCKER_IMAGE: ${{ secrets.DOCKER_USER }}/ms-saudacoes-aleatorias
+
+jobs:
+  build-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+      - name: Lint
+        run: go fmt ./...
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build-lint
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+      - name: Run tests
+        run: go test ./...
+
+  release:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+      - name: Build Docker Image
+        run: docker build -t ${{ env.DOCKER_IMAGE }} .
+      - name: Push Docker Image
+        run: docker push ${{ env.DOCKER_IMAGE }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy to Koyeb
+        run: |
+          curl -X POST https://app.koyeb.com/v1/services \
+            -H "Authorization: Bearer ${{ secrets.KOYEB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d @infra/deploy.json
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: ${{ github.event.inputs.approve == 'true' }}
+    steps:
+      - name: Cleanup on Koyeb
+        run: |
+          curl -X DELETE https://app.koyeb.com/v1/services/ms-saudacoes-aleatorias \
+            -H "Authorization: Bearer ${{ secrets.KOYEB_TOKEN }}"
