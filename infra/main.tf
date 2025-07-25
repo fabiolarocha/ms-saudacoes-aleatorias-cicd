@@ -12,14 +12,14 @@ provider "koyeb" {
 
 # Define o aplicativo Koyeb (uma coleção de serviços)
 # O nome do aplicativo precisa ser único na sua organização do Koyeb.
-resource "koyeb_app" "ms-saudacoes-aleatorias-app" {
-  name = var.app_name # Usando a variável app_name
+resource "koyeb_app" "ms_saudacoes_aleatorias" {
+  name = "ms-saudacoes-aleatorias-app"
 }
 
 # Define o serviço Koyeb que executa a imagem Docker
 resource "koyeb_service" "ms-saudacoes-aleatorias-service" {
   # Vincula este serviço ao aplicativo criado acima
-  app_name = koyeb_app.ms-saudacoes-aleatorias-app_name 
+  app_name = koyeb_app.ms_saudacoes_aleatorias.name 
 
   # Definição do serviço em si
   definition {
